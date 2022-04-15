@@ -6,28 +6,31 @@ if __name__ == "__main__":
 
     successful_startup = False
     restart_threshold = 0
-    while successful_startup != True or restart_threshold <= 3:
+    failed_restart_cmd_threshold = 0
+    
+
+    while successful_startup != True:
+        
+        if restart_threshold > 3:
+            print("Server was in safemode and failed to succssessfully start 3 times")
+            exit()
+
         health = probe_server(api_url, headers)
+
         if health['status'] == "unhealthy":
             print(health['error'])
             restarted = False #restarted = restart_octoprint_server(api_url, headers)
             if restarted == False:
-                print(health['error'])
-                restarted = False #restarted = restart_octoprint_server(api_url, headers)
-                if restarted == False:
-                    print(health['error'])
+                while failed_restart_cmd_threshold < 4:
                     restarted = False #restarted = restart_octoprint_server(api_url, headers)
-                    if restarted == False:
-                        print("Server was in safemode and failed to send restart command 3 times")
-                        exit()
-                else:
-                    restart_threshold += 1
+                    failed_restart_cmd_threshold += 1
+                    print("Server was in safemode and failed to send restart command 3 times")
+                    exit()
             else:
-                restart_threshold += 1
+                restart_threshold += 1      
         else:
             successful_startup = True
 
-    if restart_threshold > 3 and successful_startup == False:
-        print("Server was in safemode and failed to restart 3 times")
+
     if successful_startup == True:
         print("Successful Startup")
