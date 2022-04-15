@@ -4,14 +4,13 @@ import json
 import time
 
 
-def token_check():
+def token_check(api_url, headers):
     octopi_token = os.environ['OCTOPI_TOKEN']
     if octopi_token is None:
-        print("octopi token not found")
-        exit()
+        shutdown_system(api_url, headers)
+        raise ValueError("OCTOPI_TOKEN not set")
     else:
         headers = {"Authorization": f"Bearer {octopi_token}"}
-    print("token check complete")
     return headers
 
 def probe_server(api_url, headers):
@@ -24,11 +23,10 @@ def probe_server(api_url, headers):
         else:
             print("server not up")
             time.sleep(2)
-            if count < 30:
+            if count < 60:
                 count+=1
             else:
-                print("Timedout probing server")
-                exit()
+                raise Exception("504: Timeout probing server")
     print("server up!")
     response = json.loads(r.content.decode("utf-8"))
     if not response['safemode'] or response['safemode'] == "False":
@@ -41,18 +39,28 @@ def probe_server(api_url, headers):
             "status": "unhealthy",
             "error": f"{response['safemode']}"
         }
-    print("returned health")
     return health
 
 
 def restart_octoprint_server(api_url, headers):
-    api_call = f"{api_url}/api/system/commands/core/restart"
+    api_call = f"{api_url}/system/commands/core/restart"
     r = requests.post(api_call, headers=headers)
     if r.status_code == 204: #204 response is No Error
         print("restarted server")
         return True
     else:
         print("got error restarting server")
+        return False
+
+
+def shutdown_system(api_url, headers):
+    api_call = f"{api_url}/system/commands/core/shutdown"
+    r = requests.post(api_call, headers=headers)
+    if r.status_code == 204: #204 response is No Error
+        print("shutdown server")
+        return True
+    else:
+        print("got error shutting down server")
         return False
 
 
