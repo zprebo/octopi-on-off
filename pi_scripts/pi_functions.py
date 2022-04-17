@@ -39,8 +39,12 @@ def completed_job_listener(api_url, headers, x = 1):
             if job_completion == 100.0:
                 return job_completion
             else:
-                print(f"{get_time()} - Going to sleep for {int((time_left * .95)/60)} minutes...")
-                time.sleep(int(time_left * 0.9))
+                format_time = int((time_left * .95)/60)
+                if format_time == 0:
+                    print(f"{get_time()} - Going to sleep for {int(time_left)} seconds...")
+                else:
+                    print(f"{get_time()} - Going to sleep for {format_time} minutes...")
+                time.sleep(int(time_left * 0.95))
         except:
             print(f"{get_time()} - Going to sleep for 2 minutes...")
             time.sleep(120)
