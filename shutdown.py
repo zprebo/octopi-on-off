@@ -1,9 +1,10 @@
 from functions import token_check, probe_server_down, restart_octoprint_server, shutdown_system
 import time
+import os
 
 if __name__ == "__main__":
     headers = token_check()
-    api_url = "http://octopi.local/api"
+    api_url = os.environ['API_URL']
 
     shutdown = False
     failed_shutdown_cmd_threshold = 0

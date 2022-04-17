@@ -1,9 +1,10 @@
 from functions import token_check, probe_server_up, restart_octoprint_server, shutdown_system
 import time
+import os
 
 
 if __name__ == "__main__":
-    api_url = "http://octopi.local/api"
+    api_url = os.environ['API_URL']
     headers = token_check()
 
     startup_timeout_threshold = 0
