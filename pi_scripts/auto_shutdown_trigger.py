@@ -1,4 +1,4 @@
-from pi_functions import token_check, completed_job_listener, trigger_alexa_routine, env_check, get_time, probe_server_down, shutdown_system
+from pi_functions import token_check, completed_job_listener, trigger_alexa_routine, env_check, get_time, shutdown_system
 import os
 
 
@@ -21,4 +21,5 @@ if __name__ == "__main__":
         print(f"{get_time()} - Shutting Down Octoprint...")
         trigger_alexa_routine()
         time.sleep(10)
-        shutdown_system(api_url, headers)  
+        shutdown_system(api_url, headers)
+        exit(0)

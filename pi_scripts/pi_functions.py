@@ -25,7 +25,6 @@ def get_time():
 
 
 def completed_job_listener(api_url, headers, x = 1):
-    #time.sleep(30)
     while x==1:
         try:
             r = requests.get(f"{api_url}/job", headers=headers)
@@ -65,31 +64,13 @@ def trigger_alexa_routine():
         r = requests.get(v_m_api_url, params=params)
         response = json.loads(r.content.decode("utf-8"))
         if response['status'] == "success":
-            print(f"{get_time()} - Routine Triggered")
-            exit(0)
+            print(f"{get_time()} - Alexa Routine Triggered Successfully...")
+            return True
         else:
             time.sleep(30)
             count += 1
     if count >=3:
         raise Exception(f"{get_time()} - 504: Timeout Triggering Alexa Routine")
-
-
-def probe_server_down(api_url, headers):
-    server_up = True
-    count = 0
-    while server_up == True:
-        try:
-            r = requests.get(f"{api_url}/server", headers=headers)
-            print(f"{get_time()} - {r.status_code}: Octoprint Server Still Up")
-            time.sleep(2)
-            if count < 30:
-                count+=1
-            else:
-                raise Exception(f"{get_time()} - 504: Timeout waiting for server to shutdown.")
-        except:
-            print(f"{get_time()} - Server Down...")
-            server_up = False
-    return server_up
 
 
 def shutdown_system(api_url, headers):
@@ -99,5 +80,5 @@ def shutdown_system(api_url, headers):
         print(f"{get_time()} - Shutdown Octopi and Octoprint Server.")
         return True
     else:
-        print(f"{get_time()} - Error Shutting Down Octopi Server. Forced Shutdown with Alexa Routine")
+        print(f"{get_time()} - Error Shutting Down Octopi Server. Forcing Shutdown with Alexa Routine")
         return False
