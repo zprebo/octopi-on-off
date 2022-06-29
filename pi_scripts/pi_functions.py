@@ -84,6 +84,49 @@ def shutdown_system(api_url, headers):
         return False
 
 
+def probe_server_up(api_url, headers):
+    server_up = False
+    count = 0
+    while server_up == False:
+        try:
+            r = requests.get(f"{api_url}/server", headers=headers)
+            if b'502 Bad Gateway' not in r.content:
+                server_up = True
+            else:
+                time.sleep(2)
+        except:
+            print("Server Unreachable...")
+            time.sleep(2)
+            if count < 45:
+                count+=1
+            else:
+                raise Exception("504: Timed out probing server to come online")
+    print("\nOctoprint Service Reachable...")
+    response = json.loads(r.content.decode("utf-8"))
+    if not response['safemode'] or response['safemode'] == "False":
+        health = {
+            "status": "healthy",
+            "error": "none"
+        }
+    else:
+        health = {
+            "status": "unhealthy",
+            "error": f"{response['safemode']}"
+        }
+    return health
+
+
+def restart_octoprint_server(api_url, headers):
+    api_call = f"{api_url}/system/commands/core/restart"
+    r = requests.post(api_call, headers=headers)
+    if r.status_code == 204: #204 response is No Error
+        print("\nRestarted Octoprint Server. Sleeping 15 seconds...")
+        return True
+    else:
+        print("\nReceived Error Code Restarting Server... Trying Again")
+        return False
+
+
 def smart_startup_probe(api_url, headers):
     startup_timeout_threshold = 0
     successful_startup = False
