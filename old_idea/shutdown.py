@@ -1,4 +1,4 @@
-from functions import token_check, probe_server_down, restart_octoprint_server, shutdown_system
+from old_idea.functions import token_check, probe_server_down, restart_octoprint_server, shutdown_system
 import time
 import os
 
